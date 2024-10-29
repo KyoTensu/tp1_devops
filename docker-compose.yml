@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+    backend:
+        build: ./BackEnd/simple-api-student-main/
+        container_name: backend
+        networks:
+            - my-network
+        ports:
+        - "8080:8080"
+        depends_on: [database]
+
+    database:
+        build: ./DB/
+        container_name: database
+        environment:
+            - POSTGRES_DB=db
+            - POSTGRES_USER=root
+            - POSTGRES_PASSWORD=toor
+        ports:
+            - "5432:5432"
+        volumes:
+            -   /my/own/datadir:/var/lib/postgresql/data
+        networks:
+            - my-network
+
+    httpd:
+        build: ./FrontEnd/
+        container_name: frontend
+        ports:
+            - "80:80"
+        networks:
+            - my-network
+        depends_on: [backend]
+
+networks:
+    my-network:
+        driver: bridge
